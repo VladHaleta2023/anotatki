@@ -1,0 +1,153 @@
+.form {
+    width: 100vw;
+    max-width: 800px;
+    padding: 20px;
+}
+
+.formTable {
+    font-size: 18px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+}
+
+.text {
+    width: 100%;
+    border: none;
+    outline: none;
+    background-color: transparent;
+    font-size: 20px;
+    line-height: 1.5;
+    font-family: inherit;
+    overflow: hidden;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 0;
+    margin: 0;
+    height: auto;
+    min-height: 24px;
+    cursor: pointer;
+    resize: none;
+    user-select: none;
+}
+
+button.btnProperty {
+    width: 50px;
+    background-color: white;
+    margin-right: 12px;
+}
+
+button.btnProperty:last-child {
+    margin-right: 0px;
+}
+
+.formTable>.element>.btnsContent {
+    display: flex;
+    width: 80px;
+    height: 40px;
+}
+
+button.btnProperty, button.btnContent {
+    font-weight: bold;
+    font-size: 20px;
+    padding: 6px 12px;
+    outline: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    border: none;
+}
+
+button.btnProperty:hover, button.btnContent:hover {
+    background-color: #577A99 !important;
+    color: white !important;
+}
+
+.formTable>.element>.btnsContent>.btnContent {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 8px;
+    color: black;
+    background-color: transparent;
+    margin-right: 5px;
+    border-radius: 6px;
+}
+
+.formTable>.element>.btnsContent>.btnContent:last-child {
+    margin-right: 0px;
+}
+
+.formTable>.elementTitle {
+    font-weight: bold;
+    font-size: 24px !important;
+    background-color: #e0e0e0 !important;
+}
+
+.formTable>.element {
+    width: 100%;
+    font-size: 20px;
+    padding: 16px;
+    outline: none;
+    transition: all 0.3s ease;
+    background-color: #f9f9f9;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    /*align-items: center;*/
+}
+
+.formTable>.elementTitle {
+    font-weight: bold;
+    background-color: #e7e7e7;
+    font-size: 24px !important;
+}
+
+.inputCustomText {
+    width: 100%;
+    min-height: 140px;
+    resize: none;
+    font-size: 20px;
+    padding: 12px;
+    background-color: #f9f9f9;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    outline: none;
+    white-space: pre-wrap;
+    word-break: break-all;
+    overflow-y: auto;
+    resize: vertical;
+    position: relative;
+    line-height: 1.5;
+}
+
+.formTable>.title {
+    margin-bottom: 8px;
+    font-size: 20px;
+}
+
+.formTable input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 20px;
+    outline: none;
+    transition: all 0.3s ease;
+    background-color: #f9f9f9;
+    box-shadow:
+        inset 0 1px 3px rgba(0, 0, 0, 0.1),
+        0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.formTable label {
+    align-self: flex-start;
+    margin-bottom: 6px;
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+}
