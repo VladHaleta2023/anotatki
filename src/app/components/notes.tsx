@@ -63,12 +63,14 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
     } finally {
       setIsLoading(false);
     }
-  }, [categoryId, topicId]); // Добавляем зависимости
+  }, [categoryId, topicId]);
 
+  // Основной useEffect для загрузки данных
   useEffect(() => {
     loadData();
-  }, [loadData]); // Теперь loadData стабильная ссылка
+  }, [loadData]); // loadData теперь стабильная функция благодаря useCallback
 
+  // Синхронизация textContent с editableRef
   useEffect(() => {
     if (editableRef.current) {
       editableRef.current.innerText = textContent;
@@ -82,6 +84,7 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
     setIsPlaying(prev => !prev);
   };
 
+  // Управление воспроизведением аудио
   useEffect(() => {
     const audioEl = audioRef.current;
     if (!audioEl) return;
@@ -97,29 +100,33 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
     playAudio();
   }, [isPlaying]);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (!audioRef.current) return;
-      const currentTime = audioRef.current.currentTime;
-      const duration = audioRef.current.duration || 0;
-      const percent = duration ? (currentTime / duration) * 100 : 0;
-      setProgress(percent);
-      setCurrentTimeFormatted(formatTime(currentTime));
-    }, 200);
-    return () => clearInterval(interval);
-  }, []);
-
+  // Обновление прогресса аудио
   useEffect(() => {
     const audioEl = audioRef.current;
     if (!audioEl) return;
 
+    const updateProgress = () => {
+      const currentTime = audioEl.currentTime;
+      const duration = audioEl.duration || 0;
+      const percent = duration ? (currentTime / duration) * 100 : 0;
+      setProgress(percent);
+      setCurrentTimeFormatted(formatTime(currentTime));
+    };
+
+    const interval = setInterval(updateProgress, 200);
+    
+    // Слушатель для обновления общей длительности
     const handleLoadedMetadata = () => {
       setTotalTimeFormatted(formatTime(audioEl.duration));
     };
 
     audioEl.addEventListener("loadedmetadata", handleLoadedMetadata);
-    return () => audioEl.removeEventListener("loadedmetadata", handleLoadedMetadata);
-  }, [audioUrl]);
+    
+    return () => {
+      clearInterval(interval);
+      audioEl.removeEventListener("loadedmetadata", handleLoadedMetadata);
+    };
+  }, [audioUrl]); // Добавляем audioUrl в зависимости
 
   const saveNotes = async () => {
     if (!topicId) return;
@@ -127,7 +134,7 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
     try {
       await ApiTopic.updateTopicNotes(categoryId, topicId, textContent);
       showAlert(200, "Notatki zapisane pomyślnie");
-      // Данные уже актуальны, не нужно перезагружать или обновлять
+      // Данные уже актуальны, не нужно перезагружать
     } catch (err) {
       showAlert(500, `Błąd zapisywania notatek: ${err}`);
     }
