@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { ApiTopic } from "@/app/api/ApiTopic";
 import showAlert from "@/app/utils/alert";
 import { TopicNotes } from "@/app/api/ApiTopic";
@@ -35,7 +35,7 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
     return `${min}:${sec.toString().padStart(2, "0")}`;
   };
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setIsLoading(true);
 
     if (!topicId || topicId === "Main Body") {
@@ -63,11 +63,11 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [categoryId, topicId]); // Добавляем зависимости
 
   useEffect(() => {
     loadData();
-  }, [categoryId, topicId]);
+  }, [loadData]); // Теперь loadData стабильная ссылка
 
   useEffect(() => {
     if (editableRef.current) {
@@ -126,13 +126,8 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
     
     try {
       await ApiTopic.updateTopicNotes(categoryId, topicId, textContent);
-      
       showAlert(200, "Notatki zapisane pomyślnie");
-      
-      setTimeout(() => {
-        loadData();
-      }, 1000);
-      
+      // Данные уже актуальны, не нужно перезагружать или обновлять
     } catch (err) {
       showAlert(500, `Błąd zapisywania notatek: ${err}`);
     }
