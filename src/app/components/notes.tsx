@@ -53,10 +53,6 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
         const newContent = topicData.current?.content || "";
         setTextContent(newContent);
         setAudioUrl(topicData.current?.audioUrl || "");
-        
-        if (editableRef.current) {
-          editableRef.current.innerText = newContent;
-        }
       } else {
         setTextContent("");
         setAudioUrl("");
@@ -72,6 +68,12 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
   useEffect(() => {
     loadData();
   }, [categoryId, topicId]);
+
+  useEffect(() => {
+    if (editableRef.current) {
+      editableRef.current.innerText = textContent;
+    }
+  }, [textContent]);
 
   const handlePlayPause = () => {
     const audioEl = audioRef.current;
@@ -127,9 +129,8 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
       
       showAlert(200, "Notatki zapisane pomyślnie");
       
-      // ПОЛНАЯ ПЕРЕЗАГРУЗКА СТРАНИЦЫ вместо loadData()
       setTimeout(() => {
-        window.location.reload();
+        loadData();
       }, 1000);
       
     } catch (err) {
@@ -159,6 +160,10 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
       sessionStorage.setItem("activeTopicName", notes?.next?.title || "");
       router.refresh();
     }
+  };
+
+  const handleInput = (e: React.FormEvent<HTMLDivElement>) => {
+    setTextContent((e.target as HTMLDivElement).innerText);
   };
 
   return (
@@ -228,7 +233,7 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
                 role="textbox"
                 aria-multiline="true"
                 data-placeholder={isAdminOn ? "Wprowadź notatki..." : ""}
-                onInput={(e) => setTextContent((e.target as HTMLDivElement).innerText)}
+                onInput={handleInput}
                 onPaste={(e) => {
                   e.preventDefault();
                   const text = e.clipboardData.getData("text/plain");
@@ -236,16 +241,21 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
                   if (!selection || !selection.rangeCount) return;
                   const range = selection.getRangeAt(0);
                   range.deleteContents();
-                  range.insertNode(document.createTextNode(text));
-                  range.collapse(false);
+                  const textNode = document.createTextNode(text);
+                  range.insertNode(textNode);
+                  range.setStartAfter(textNode);
+                  range.setEndAfter(textNode);
                   selection.removeAllRanges();
                   selection.addRange(range);
+                  
+                  setTextContent((e.target as HTMLDivElement).innerText);
                 }}
                 spellCheck={false}
                 style={{
                   whiteSpace: "pre-wrap",
                   outline: "none",
                   cursor: isAdminOn ? "text" : "default",
+                  minHeight: "200px",
                 }}
               />
             </div>
