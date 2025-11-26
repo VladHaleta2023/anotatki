@@ -5,7 +5,6 @@ import { TopicNotes } from "@/app/api/ApiTopic";
 import Spinner from "@/app/components/spinner";
 import { ArrowLeft, ArrowRight, ArrowUp, Pause, Play } from "lucide-react";
 import "@/app/styles/notes.css";
-import { useRouter } from "next/navigation";
 
 type NotesProps = {
   isAdminOn: boolean;
@@ -15,7 +14,6 @@ type NotesProps = {
 };
 
 export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: NotesProps) {
-  const router = useRouter();
   const [textContent, setTextContent] = useState("");
   const [audioUrl, setAudioUrl] = useState("");
   const [notes, setNotes] = useState<TopicNotes | null>(null);
@@ -153,7 +151,7 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
   const exitNotes = () => {
     sessionStorage.removeItem("activeTopic");
     sessionStorage.removeItem("activeTopicName");
-    router.refresh();
+    window.location.reload();
   };
 
   const handleBehavior = () => {
@@ -161,7 +159,7 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
     if (behaviorTopicId) {
       sessionStorage.setItem("activeTopic", behaviorTopicId);
       sessionStorage.setItem("activeTopicName", notes?.behavior?.title || "");
-      router.refresh();
+      window.location.reload();
     }
   };
 
@@ -170,7 +168,7 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
     if (nextTopicId) {
       sessionStorage.setItem("activeTopic", nextTopicId);
       sessionStorage.setItem("activeTopicName", notes?.next?.title || "");
-      router.refresh();
+      window.location.reload();
     }
   };
 
