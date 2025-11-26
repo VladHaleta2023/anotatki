@@ -24,7 +24,6 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
   const [progress, setProgress] = useState(0);
   const [currentTimeFormatted, setCurrentTimeFormatted] = useState("0:00");
   const [totalTimeFormatted, setTotalTimeFormatted] = useState("0:00");
-  const [isAudioLoaded, setIsAudioLoaded] = useState(false);
 
   const editableRef = useRef<HTMLDivElement | null>(null);
 
@@ -96,25 +95,6 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
     };
     playAudio();
   }, [isPlaying]);
-
-  useEffect(() => {
-    const audioEl = audioRef.current;
-    if (!audioEl) return;
-
-    setIsAudioLoaded(false);
-
-    const handleLoadedData = () => {
-      if (audioEl.readyState >= 4) {
-        setIsAudioLoaded(true);
-      }
-    };
-
-    audioEl.addEventListener("loadeddata", handleLoadedData);
-
-    return () => {
-      audioEl.removeEventListener("loadeddata", handleLoadedData);
-    };
-  }, [audioUrl]);
 
   useEffect(() => {
     const audioEl = audioRef.current;
@@ -194,7 +174,7 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
 
   return (
     <>
-      {isLoading || (audioUrl && !isAudioLoaded) ? (
+      {isLoading ? (
         <main>
           <Spinner />
         </main>
