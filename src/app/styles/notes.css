@@ -6,6 +6,8 @@
   font-size: 20px;
   overflow-y: auto !important;
   flex-grow: 1 !important;
+  display: flex;
+  flex-direction: column;
 }
 
 .form-notes > .text {
@@ -24,6 +26,7 @@
   outline: none;
   resize: none;
   cursor: text;
+  flex-grow: 1;
 }
 
 .form-notes > .text:empty::before {
