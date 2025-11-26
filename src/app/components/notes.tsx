@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { ApiTopic } from "@/app/api/ApiTopic";
 import showAlert from "@/app/utils/alert";
 import { TopicNotes } from "@/app/api/ApiTopic";
@@ -35,56 +35,54 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
     return `${min}:${sec.toString().padStart(2, "0")}`;
   };
 
-  const loadData = useCallback(async () => {
-    setIsLoading(true);
+  useEffect(() => {
+    async function loadData() {
+      setIsLoading(true);
 
-    if (!topicId || topicId === "Main Body") {
-      setTextContent("");
-      setAudioUrl("");
-      setNotes(null);
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      const topicData = await ApiTopic.fetchTopicById(categoryId, topicId);
-      if (topicData) {
-        setNotes(topicData);
-        const newContent = topicData.current?.content || "";
-        setTextContent(newContent);
-        setAudioUrl(topicData.current?.audioUrl || "");
-      } else {
+      if (!topicId || topicId === "Main Body") {
         setTextContent("");
         setAudioUrl("");
         setNotes(null);
+        setIsLoading(false);
+        return;
       }
-    } catch (err) {
-      showAlert(500, `Błąd ładowania tematu: ${err}`);
-    } finally {
-      setIsLoading(false);
+
+      try {
+        const topicData = await ApiTopic.fetchTopicById(categoryId, topicId);
+        if (topicData) {
+          setNotes(topicData);
+          const newContent = topicData.current?.content || "";
+          setTextContent(newContent);
+
+          const newAudioUrl = topicData.current?.audioUrl
+            ? `${topicData.current.audioUrl}?t=${Date.now()}`
+            : "";
+          setAudioUrl(newAudioUrl);
+        } else {
+          setTextContent("");
+          setAudioUrl("");
+          setNotes(null);
+        }
+      } catch (err) {
+        showAlert(500, `Błąd ładowania tematu: ${err}`);
+      } finally {
+        setIsLoading(false);
+      }
     }
+
+    loadData();
   }, [categoryId, topicId]);
 
-  // Основной useEffect для загрузки данных
   useEffect(() => {
-    loadData();
-  }, [loadData]); // loadData теперь стабильная функция благодаря useCallback
-
-  // Синхронизация textContent с editableRef
-  useEffect(() => {
-    if (editableRef.current) {
+    if (editableRef.current && editableRef.current.innerText !== textContent) {
       editableRef.current.innerText = textContent;
     }
   }, [textContent]);
 
   const handlePlayPause = () => {
-    const audioEl = audioRef.current;
-    if (!audioEl) return;
-
     setIsPlaying(prev => !prev);
   };
 
-  // Управление воспроизведением аудио
   useEffect(() => {
     const audioEl = audioRef.current;
     if (!audioEl) return;
@@ -100,7 +98,6 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
     playAudio();
   }, [isPlaying]);
 
-  // Обновление прогресса аудио
   useEffect(() => {
     const audioEl = audioRef.current;
     if (!audioEl) return;
@@ -114,27 +111,40 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
     };
 
     const interval = setInterval(updateProgress, 200);
-    
-    // Слушатель для обновления общей длительности
+
     const handleLoadedMetadata = () => {
       setTotalTimeFormatted(formatTime(audioEl.duration));
     };
 
     audioEl.addEventListener("loadedmetadata", handleLoadedMetadata);
-    
+
     return () => {
       clearInterval(interval);
       audioEl.removeEventListener("loadedmetadata", handleLoadedMetadata);
     };
-  }, [audioUrl]); // Добавляем audioUrl в зависимости
+  }, [audioUrl]);
+
+  useEffect(() => {
+    const audioEl = audioRef.current;
+    if (!audioEl) return;
+
+    audioEl.pause();
+    audioEl.currentTime = 0;
+    audioEl.src = audioUrl;
+    setProgress(0);
+    setCurrentTimeFormatted("0:00");
+    setTotalTimeFormatted("0:00");
+  }, [audioUrl]);
 
   const saveNotes = async () => {
     if (!topicId) return;
-    
+
     try {
       await ApiTopic.updateTopicNotes(categoryId, topicId, textContent);
-      showAlert(200, "Notatki zapisane pomyślnie");
-      // Данные уже актуальны, не нужно перезагружать
+      
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
     } catch (err) {
       showAlert(500, `Błąd zapisywania notatek: ${err}`);
     }
@@ -143,7 +153,7 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
   const exitNotes = () => {
     sessionStorage.removeItem("activeTopic");
     sessionStorage.removeItem("activeTopicName");
-    window.location.reload();
+    router.refresh();
   };
 
   const handleBehavior = () => {
@@ -164,10 +174,6 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
     }
   };
 
-  const handleInput = (e: React.FormEvent<HTMLDivElement>) => {
-    setTextContent((e.target as HTMLDivElement).innerText);
-  };
-
   return (
     <>
       {isLoading ? (
@@ -179,16 +185,16 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
           <div className="form">
             <div className="btnsNotes">
               <div className="btnsNavigation">
-                <button className="btnProperty" onClick={exitNotes}>
+                <button className="btnProperty" onClick={exitNotes} style={{ marginBottom: 0 }}>
                   <ArrowUp size={24} />
                 </button>
                 {notes?.behavior && (
-                  <button className="btnProperty" onClick={handleBehavior}>
+                  <button className="btnProperty" onClick={handleBehavior} style={{ marginBottom: 0 }}>
                     <ArrowLeft size={24} />
                   </button>
                 )}
                 {notes?.next && (
-                  <button className="btnProperty" onClick={handleNext}>
+                  <button className="btnProperty" onClick={handleNext} style={{ marginBottom: 0 }}>
                     <ArrowRight size={24} />
                   </button>
                 )}
@@ -219,7 +225,6 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
                 </div>
                 <audio
                   ref={audioRef}
-                  src={audioUrl || undefined}
                   preload="metadata"
                   onEnded={() => setIsPlaying(false)}
                 />
@@ -231,33 +236,50 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
                 ref={editableRef}
                 className="text"
                 contentEditable={isAdminOn}
-                suppressContentEditableWarning
+                suppressContentEditableWarning={true}
                 role="textbox"
                 aria-multiline="true"
                 data-placeholder={isAdminOn ? "Wprowadź notatki..." : ""}
-                onInput={handleInput}
+                onInput={(e) => {
+                  const el = e.target as HTMLDivElement;
+                  setTextContent(el.innerText);
+
+                  el.style.height = "auto";
+                  el.style.height = el.scrollHeight + "px";
+
+                  el.scrollTop = el.scrollHeight;
+                }}
                 onPaste={(e) => {
                   e.preventDefault();
                   const text = e.clipboardData.getData("text/plain");
+
                   const selection = window.getSelection();
                   if (!selection || !selection.rangeCount) return;
+
                   const range = selection.getRangeAt(0);
                   range.deleteContents();
                   const textNode = document.createTextNode(text);
                   range.insertNode(textNode);
+
                   range.setStartAfter(textNode);
                   range.setEndAfter(textNode);
                   selection.removeAllRanges();
                   selection.addRange(range);
-                  
-                  setTextContent((e.target as HTMLDivElement).innerText);
+
+                  const el = editableRef.current;
+                  if (el) {
+                    setTextContent(el.innerText);
+                    el.style.height = "auto";
+                    el.style.height = el.scrollHeight + "px";
+                    el.scrollTop = el.scrollHeight;
+                  }
                 }}
                 spellCheck={false}
                 style={{
                   whiteSpace: "pre-wrap",
                   outline: "none",
                   cursor: isAdminOn ? "text" : "default",
-                  minHeight: "200px",
+                  overflowY: "hidden",
                 }}
               />
             </div>
