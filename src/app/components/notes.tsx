@@ -18,13 +18,13 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
   const [audioUrl, setAudioUrl] = useState("");
   const [notes, setNotes] = useState<TopicNotes | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isAudioLoaded, setIsAudioLoaded] = useState(false);
 
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentTimeFormatted, setCurrentTimeFormatted] = useState("0:00");
   const [totalTimeFormatted, setTotalTimeFormatted] = useState("0:00");
+  const [isAudioLoaded, setIsAudioLoaded] = useState(false);
 
   const editableRef = useRef<HTMLDivElement | null>(null);
 
@@ -37,7 +37,6 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
   useEffect(() => {
     async function loadData() {
       setIsLoading(true);
-      setIsAudioLoaded(false);
 
       if (!topicId || topicId === "Main Body") {
         setTextContent("");
@@ -79,6 +78,10 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
     }
   }, [textContent]);
 
+  const handlePlayPause = () => {
+    setIsPlaying(prev => !prev);
+  };
+
   useEffect(() => {
     const audioEl = audioRef.current;
     if (!audioEl) return;
@@ -93,6 +96,25 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
     };
     playAudio();
   }, [isPlaying]);
+
+  useEffect(() => {
+    const audioEl = audioRef.current;
+    if (!audioEl) return;
+
+    setIsAudioLoaded(false);
+
+    const handleLoadedData = () => {
+      if (audioEl.readyState >= 4) {
+        setIsAudioLoaded(true);
+      }
+    };
+
+    audioEl.addEventListener("loadeddata", handleLoadedData);
+
+    return () => {
+      audioEl.removeEventListener("loadeddata", handleLoadedData);
+    };
+  }, [audioUrl]);
 
   useEffect(() => {
     const audioEl = audioRef.current;
@@ -124,28 +146,12 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
     const audioEl = audioRef.current;
     if (!audioEl) return;
 
-    const handleCanPlay = () => {
-      setIsAudioLoaded(true);
-    };
-
-    audioEl.addEventListener("canplaythrough", handleCanPlay);
-
-    return () => {
-      audioEl.removeEventListener("canplaythrough", handleCanPlay);
-    };
-  }, [audioUrl]);
-
-  useEffect(() => {
-    const audioEl = audioRef.current;
-    if (!audioEl) return;
-
     audioEl.pause();
     audioEl.currentTime = 0;
     audioEl.src = audioUrl;
     setProgress(0);
     setCurrentTimeFormatted("0:00");
     setTotalTimeFormatted("0:00");
-    setIsAudioLoaded(false);
   }, [audioUrl]);
 
   const saveNotes = async () => {
@@ -153,7 +159,7 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
 
     try {
       await ApiTopic.updateTopicNotes(categoryId, topicId, textContent);
-
+      
       setTimeout(() => {
         window.location.reload();
       }, 1500);
@@ -188,7 +194,7 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
 
   return (
     <>
-      {isLoading || !isAudioLoaded ? (
+      {isLoading || (audioUrl && !isAudioLoaded) ? (
         <main>
           <Spinner />
         </main>
@@ -220,7 +226,7 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
             <div className="form-notes word-break">
               <div className="audio-player">
                 <div className="audio-controls">
-                  <button className="btnOption" onClick={() => setIsPlaying(prev => !prev)}>
+                  <button className="btnOption" onClick={handlePlayPause}>
                     {isPlaying ? <Pause size={24} /> : <Play size={24} />}
                   </button>
                   <div style={{ marginLeft: 8, flexGrow: 1 }}>
@@ -255,19 +261,24 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
                 onInput={(e) => {
                   const el = e.target as HTMLDivElement;
                   setTextContent(el.innerText);
+
                   el.style.height = "auto";
                   el.style.height = el.scrollHeight + "px";
+
                   el.scrollTop = el.scrollHeight;
                 }}
                 onPaste={(e) => {
                   e.preventDefault();
                   const text = e.clipboardData.getData("text/plain");
+
                   const selection = window.getSelection();
                   if (!selection || !selection.rangeCount) return;
+
                   const range = selection.getRangeAt(0);
                   range.deleteContents();
                   const textNode = document.createTextNode(text);
                   range.insertNode(textNode);
+
                   range.setStartAfter(textNode);
                   range.setEndAfter(textNode);
                   selection.removeAllRanges();
