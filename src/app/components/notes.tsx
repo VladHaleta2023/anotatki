@@ -142,7 +142,7 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
       
       setTimeout(() => {
         window.location.reload();
-      }, 1500);
+      }, 2000);
     } catch (err) {
       showAlert(500, `Błąd zapisywania notatek: ${err}`);
     }
