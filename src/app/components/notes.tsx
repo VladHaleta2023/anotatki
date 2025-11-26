@@ -18,6 +18,7 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
   const [audioUrl, setAudioUrl] = useState("");
   const [notes, setNotes] = useState<TopicNotes | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAudioLoaded, setIsAudioLoaded] = useState(false);
 
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -36,12 +37,14 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
   useEffect(() => {
     async function loadData() {
       setIsLoading(true);
+      setIsAudioLoaded(false);
 
       if (!topicId || topicId === "Main Body") {
         setTextContent("");
         setAudioUrl("");
         setNotes(null);
         setIsLoading(false);
+        setIsAudioLoaded(true);
         return;
       }
 
@@ -60,9 +63,11 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
           setTextContent("");
           setAudioUrl("");
           setNotes(null);
+          setIsAudioLoaded(true);
         }
       } catch (err) {
         showAlert(500, `Błąd ładowania tematu: ${err}`);
+        setIsAudioLoaded(true);
       } finally {
         setIsLoading(false);
       }
@@ -112,13 +117,22 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
 
     const handleLoadedMetadata = () => {
       setTotalTimeFormatted(formatTime(audioEl.duration));
+      setIsAudioLoaded(true);
+    };
+
+    const handleError = () => {
+      setIsAudioLoaded(true);
     };
 
     audioEl.addEventListener("loadedmetadata", handleLoadedMetadata);
+    audioEl.addEventListener("error", handleError);
+    audioEl.addEventListener("canplaythrough", handleLoadedMetadata);
 
     return () => {
       clearInterval(interval);
       audioEl.removeEventListener("loadedmetadata", handleLoadedMetadata);
+      audioEl.removeEventListener("error", handleError);
+      audioEl.removeEventListener("canplaythrough", handleLoadedMetadata);
     };
   }, [audioUrl]);
 
@@ -126,12 +140,17 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
     const audioEl = audioRef.current;
     if (!audioEl) return;
 
+    setIsAudioLoaded(false);
     audioEl.pause();
     audioEl.currentTime = 0;
     audioEl.src = audioUrl;
     setProgress(0);
     setCurrentTimeFormatted("0:00");
     setTotalTimeFormatted("0:00");
+
+    if (!audioUrl) {
+      setIsAudioLoaded(true);
+    }
   }, [audioUrl]);
 
   const saveNotes = async () => {
@@ -172,9 +191,11 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
     }
   };
 
+  const showSpinner = isLoading || !isAudioLoaded;
+
   return (
     <>
-      {isLoading ? (
+      {showSpinner ? (
         <main>
           <Spinner />
         </main>
