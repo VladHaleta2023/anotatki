@@ -1,7 +1,7 @@
 {
   "/_not-found/page": "/_not-found",
-  "/add/page": "/add",
-  "/admin/page": "/admin",
   "/page": "/",
+  "/admin/page": "/admin",
+  "/add/page": "/add",
   "/edit/page": "/edit"
 }
