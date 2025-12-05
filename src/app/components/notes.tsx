@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { ApiTopic } from "@/app/api/ApiTopic";
 import showAlert from "@/app/utils/alert";
 import { TopicNotes } from "@/app/api/ApiTopic";
@@ -26,6 +26,15 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
   const [totalTimeFormatted, setTotalTimeFormatted] = useState("0:00");
 
   const editableRef = useRef<HTMLDivElement | null>(null);
+
+  const handleFocus = useCallback(() => {
+    setTimeout(() => {
+      editableRef.current?.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'center' 
+      });
+    }, 350);
+  }, []);
 
   const formatTime = (seconds: number) => {
     const min = Math.floor(seconds / 60);
@@ -238,6 +247,7 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
                 role="textbox"
                 aria-multiline="true"
                 data-placeholder={isAdminOn ? "Wprowadź notatki..." : ""}
+                onFocus={handleFocus}
                 onInput={(e) => {
                   const el = e.target as HTMLDivElement;
                   setTextContent(el.innerText);
@@ -278,6 +288,7 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
                   outline: "none",
                   cursor: isAdminOn ? "text" : "default",
                   overflowY: "hidden",
+                  fontSize: "16px",
                 }}
               />
             </div>

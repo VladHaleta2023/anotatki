@@ -125,3 +125,23 @@ progress.progress-bar::-moz-progress-bar {
   background: linear-gradient(to right, #2563eb, #4f46e5);
   border-radius: 8px;
 }
+
+@media (max-width: 768px) {
+  .form-notes {
+    padding-bottom: 50vh !important;
+  }
+  
+  .form-notes > .text {
+    font-size: 16px !important;
+  }
+}
+
+input, textarea, [contenteditable] {
+  font-size: 16px !important;
+}
+
+@supports (-webkit-touch-callout: none) {
+  .form-notes {
+    height: -webkit-fill-available;
+  }
+}
