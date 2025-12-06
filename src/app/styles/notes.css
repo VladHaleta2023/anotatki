@@ -127,16 +127,15 @@ progress.progress-bar::-moz-progress-bar {
 /* MOBILE */
 @media (max-width: 768px) {
   .form-notes {
-    padding-bottom: 40vh !important;
+    padding-bottom: 16px; /* минимальный padding */
+    height: calc(100vh - 60px - 60px); /* вычитаем header + аудио/кнопки */
+    overflow-y: auto;
   }
 
   .form-notes > .text {
     font-size: 16px !important;
+    min-height: 1.3em; /* как на ПК */
   }
-}
-
-input, textarea, [contenteditable] {
-  font-size: 16px !important;
 }
 
 /* SAFARI FIX */
