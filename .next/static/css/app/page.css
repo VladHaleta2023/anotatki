@@ -612,19 +612,16 @@ progress.progress-bar::-moz-progress-bar {
 /* MOBILE */
 @media (max-width: 768px) {
   .form-notes {
-    padding-bottom: 40vh !important;
+    padding-bottom: 16px;
+    overflow-y: auto;
   }
 
   .form-notes > .text {
     font-size: 16px !important;
+    min-height: 1.3em;
   }
 }
 
-input, textarea, [contenteditable] {
-  font-size: 16px !important;
-}
-
-/* SAFARI FIX */
 @supports (-webkit-touch-callout: none) {
   .form-notes {
     height: 100%;

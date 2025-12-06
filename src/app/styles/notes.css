@@ -133,12 +133,21 @@ progress.progress-bar::-moz-progress-bar {
 /* MOBILE */
 @media (max-width: 768px) {
   .form-notes {
-    padding-bottom: env(safe-area-inset-bottom);
+    padding-bottom: 16px; /* минимальный padding */
+    height: calc(100vh - 60px - 60px); /* вычитаем header + аудио/кнопки */
     overflow-y: auto;
   }
 
   .form-notes > .text {
     font-size: 16px !important;
-    min-height: 1.3em; /* как на ПК */
+    min-height: 1.3em;
+  }
+}
+
+/* SAFARI FIX */
+@supports (-webkit-touch-callout: none) {
+  .form-notes {
+    height: 100%;
+    min-height: -webkit-fill-available;
   }
 }
