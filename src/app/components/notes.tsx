@@ -33,12 +33,6 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
   };
 
   useEffect(() => {
-    const el = editableRef.current;
-    if (!el) return;
-    el.style.height = "1.3em";
-  }, []);
-
-  useEffect(() => {
     async function loadData() {
       setIsLoading(true);
 
@@ -76,12 +70,17 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
   }, [categoryId, topicId]);
 
   useEffect(() => {
-    if (editableRef.current && editableRef.current.innerText !== textContent) {
-      editableRef.current.innerText = textContent;
+    const el = editableRef.current;
+    if (!el) return;
+
+    if (el.innerText !== textContent) {
+      el.innerText = textContent;
     }
+
+    el.style.height = "auto";
+    el.style.height = el.scrollHeight + "px";
   }, [textContent]);
 
-  /* -------- MOBILE KEYBOARD FIX -------- */
   useEffect(() => {
     const el = editableRef.current;
     if (!el) return;
@@ -109,8 +108,6 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
       }
     };
   }, []);
-
-  /* -------- AUDIO -------- */
 
   const handlePlayPause = () => {
     setIsPlaying((p) => !p);
@@ -158,8 +155,6 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
     audio.src = audioUrl;
   }, [audioUrl]);
 
-  /* -------- SAVE -------- */
-
   const saveNotes = async () => {
     if (!topicId) return;
 
@@ -192,8 +187,6 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
     sessionStorage.setItem("activeTopicName", notes?.next?.title || "");
     window.location.reload();
   };
-
-  /* -------- TEXT INPUT -------- */
 
   const handleInput = (e: React.FormEvent<HTMLDivElement>) => {
     const el = e.currentTarget;
