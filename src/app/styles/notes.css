@@ -104,6 +104,7 @@ progress.progress-bar {
   appearance: none;
   -webkit-appearance: none;
   overflow: hidden;
+  width: 100%;
 }
 
 progress.progress-bar::-webkit-progress-bar {

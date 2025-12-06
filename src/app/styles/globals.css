@@ -30,6 +30,8 @@ main {
   align-items: center;
   background-color: #D3D3D3;
   padding-top: 0;
+  height: calc(100vh - 60.86px);
+  max-height: calc(100vh - 60.86px);
   overflow-y: auto;
 }
 
