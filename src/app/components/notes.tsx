@@ -85,27 +85,29 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
     const el = editableRef.current;
     if (!el) return;
 
+    const scrollToElement = () => {
+      const formNotes = document.querySelector('.form-notes');
+      if (!formNotes) return;
+
+      const elementTop = el.offsetTop;
+      const containerHeight = formNotes.clientHeight;
+      
+      const targetScroll = elementTop - (containerHeight * 0.3);
+      
+      formNotes.scrollTo({
+        top: targetScroll,
+        behavior: 'smooth'
+      });
+    };
+
     const handleFocus = () => {
-      setTimeout(() => {
-        el.scrollIntoView({ block: "center", behavior: "smooth" });
-      }, 200);
+      setTimeout(scrollToElement, 300);
     };
 
-    const handleViewportResize = () => {
-      el.scrollIntoView({ block: "center" });
-    };
-
-    el.addEventListener("focus", handleFocus);
-
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener("resize", handleViewportResize);
-    }
-
+    el.addEventListener('focus', handleFocus);
+    
     return () => {
-      el.removeEventListener("focus", handleFocus);
-      if (window.visualViewport) {
-        window.visualViewport.removeEventListener("resize", handleViewportResize);
-      }
+      el.removeEventListener('focus', handleFocus);
     };
   }, []);
 
@@ -195,7 +197,26 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
     el.style.height = "auto";
     el.style.height = el.scrollHeight + "px";
 
-    el.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    if ('ontouchstart' in window) {
+      requestAnimationFrame(() => {
+        const formNotes = document.querySelector('.form-notes');
+        if (!formNotes) return;
+
+        const selection = window.getSelection();
+        if (!selection || selection.rangeCount === 0) return;
+        
+        const range = selection.getRangeAt(0);
+        const cursorRect = range.getBoundingClientRect();
+        const formRect = formNotes.getBoundingClientRect();
+        
+        if (cursorRect.bottom > formRect.bottom - 100) {
+          formNotes.scrollBy({
+            top: 50,
+            behavior: 'smooth'
+          });
+        }
+      });
+    }
   };
 
   const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {

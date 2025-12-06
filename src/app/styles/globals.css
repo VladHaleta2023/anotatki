@@ -14,13 +14,14 @@
 body, html {
   height: 100%;
   margin: 0;
-  overflow: auto;
+  overflow: hidden;
 }
 
 #root {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: 100dvh;
+  overflow: hidden;
 }
 
 main {
@@ -31,7 +32,8 @@ main {
   background-color: #D3D3D3;
   padding-top: 0;
   height: calc(100dvh - 60.86px);
-  overflow-y: auto;
+  overflow: hidden;
+  min-height: 0;
 }
 
 ul {

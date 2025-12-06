@@ -4,10 +4,12 @@
   background-color: white;
   color: black;
   font-size: 20px;
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
   position: relative;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
 }
 
 .form-notes > .text {
@@ -19,8 +21,8 @@
   font-family: inherit;
   padding: 0;
   margin: 0;
-  min-height: 1.3em; /* минимум одна строка */
-  max-height: none;   /* убираем ограничения */
+  min-height: 1.3em;
+  max-height: none;
   white-space: pre-wrap;
   word-break: break-word;
   overflow-wrap: break-word;
@@ -130,24 +132,21 @@ progress.progress-bar::-moz-progress-bar {
   border-radius: 8px;
 }
 
-/* MOBILE */
-@media (max-width: 768px) {
-  .form-notes {
-    padding-bottom: 16px; /* минимальный padding */
-    height: calc(100vh - 60px - 60px); /* вычитаем header + аудио/кнопки */
-    overflow-y: auto;
-  }
-
-  .form-notes > .text {
-    font-size: 16px !important;
-    min-height: 1.3em;
-  }
-}
-
 /* SAFARI FIX */
 @supports (-webkit-touch-callout: none) {
   .form-notes {
     height: 100%;
     min-height: -webkit-fill-available;
+  }
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .form-notes {
+    overflow-y: auto;
+  }
+
+  .form-notes > .text {
+    min-height: 1.3em;
   }
 }
