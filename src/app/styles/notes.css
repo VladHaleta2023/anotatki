@@ -127,8 +127,8 @@ progress.progress-bar::-moz-progress-bar {
 /* MOBILE */
 @media (max-width: 768px) {
   .form-notes {
-    padding-bottom: 16px; /* минимальный padding */
-    height: calc(100vh - 60px - 60px); /* вычитаем header + аудио/кнопки */
+    padding-bottom: env(safe-area-inset-bottom); /* минимальный padding */
+    height: calc(100dvh - 60px - 60px); /* вычитаем header + аудио/кнопки */
     overflow-y: auto;
   }
 
@@ -141,7 +141,6 @@ progress.progress-bar::-moz-progress-bar {
 /* SAFARI FIX */
 @supports (-webkit-touch-callout: none) {
   .form-notes {
-    height: 100%;
-    min-height: -webkit-fill-available;
+    height: 100dvh; /* заменяем 100% и -webkit-fill-available */
   }
 }
