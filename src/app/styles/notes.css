@@ -4,8 +4,7 @@
   background-color: white;
   color: black;
   font-size: 20px;
-  overflow-y: auto !important;
-  flex-grow: 1 !important;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   position: relative;
@@ -20,9 +19,11 @@
   font-family: inherit;
   padding: 0;
   margin: 0;
-  min-height: 1.3em;
-  max-height: none;
+  min-height: 1.3em; /* минимум одна строка */
+  max-height: none;   /* убираем ограничения */
   white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: break-word;
   user-select: text;
   outline: none;
   resize: none;
@@ -32,7 +33,12 @@
 .form-notes > .text[data-placeholder]:empty::before {
   content: attr(data-placeholder);
   color: #888;
+  pointer-events: none;
+  user-select: none;
+  display: block;
 }
+
+/* Остальное оставляем без изменений */
 
 .btnsNotes {
   width: 100%;
@@ -127,20 +133,12 @@ progress.progress-bar::-moz-progress-bar {
 /* MOBILE */
 @media (max-width: 768px) {
   .form-notes {
-    padding-bottom: env(safe-area-inset-bottom); /* минимальный padding */
-    height: calc(100dvh - 60px - 60px); /* вычитаем header + аудио/кнопки */
+    padding-bottom: env(safe-area-inset-bottom);
     overflow-y: auto;
   }
 
   .form-notes > .text {
     font-size: 16px !important;
     min-height: 1.3em; /* как на ПК */
-  }
-}
-
-/* SAFARI FIX */
-@supports (-webkit-touch-callout: none) {
-  .form-notes {
-    height: 100dvh; /* заменяем 100% и -webkit-fill-available */
   }
 }
