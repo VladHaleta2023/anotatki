@@ -33,6 +33,12 @@ export default function Notes({ isAdminOn, categoryId, topicId, textTitle }: Not
   };
 
   useEffect(() => {
+    const el = editableRef.current;
+    if (!el) return;
+    el.style.height = "1.3em";
+  }, []);
+
+  useEffect(() => {
     async function loadData() {
       setIsLoading(true);
 
